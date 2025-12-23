@@ -1,0 +1,48 @@
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Override .env for Docker internal networking
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      # Explicitly pass GEMINI_API_KEY from .env (docker-compose will read it)
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      # - db
+      - redis
+
+  worker:
+    build: .
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      # Explicitly pass GEMINI_API_KEY from .env (docker-compose will read it)
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      # - db
+      - redis
+
+  # db:
+  #   image: postgres:15
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_DB=nasir_db
+  #     - POSTGRES_USER=nasir_user
+  #     - POSTGRES_PASSWORD=nasir_password
+
+  redis:
+    image: redis:8.4.0
+    ports:
+      - "6379:6379"

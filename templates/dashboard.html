@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 text-center">
+        <h1 class="display-4 mb-4">Dashboard</h1>
+        <div class="d-grid gap-3 col-6 mx-auto">
+            <a href="{% url 'upload_document' %}" class="btn btn-primary btn-lg">
+                Upload Document
+            </a>
+            <a href="{% url 'document_list' %}" class="btn btn-secondary btn-lg">
+                View My PDFs
+            </a>
+            <a href="{% url 'semantic_search' %}" class="btn btn-info btn-lg text-white">
+                Semantic Search
+            </a>
+            <a href="{% url 'qna' %}" class="btn btn-success btn-lg">
+                Ask Questions
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

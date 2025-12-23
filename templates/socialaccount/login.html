@@ -1,0 +1,23 @@
+{% load socialaccount %}
+{% load i18n %}
+
+{% get_providers as socialaccount_providers %}
+
+{% for provider in socialaccount_providers %}
+    {% if provider.id == "google" %}
+        <script>
+            // Auto-submit the form to proceed to Google OAuth
+            window.onload = function() {
+                document.forms[0].submit();
+            };
+        </script>
+        <form method="post" style="display: none;">
+            {% csrf_token %}
+            <button type="submit">Continue to Google</button>
+        </form>
+        <div class="text-center" style="margin-top: 50px;">
+            <p>Redirecting to Google...</p>
+        </div>
+    {% endif %}
+{% endfor %}
+

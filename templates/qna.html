@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Ask Questions About Your PDFs</h2>
+        <p class="text-muted">Ask questions and get answers based on the content of your uploaded PDFs.</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <form method="get" class="d-flex">
+            <input class="form-control me-2" type="text" name="q" placeholder="Enter your question..." 
+                aria-label="Question" value="{{ question }}" required>
+            <button class="btn btn-primary" type="submit">Ask</button>
+        </form>
+    </div>
+</div>
+
+{% if question %}
+<div class="row">
+    <div class="col-md-12">
+        <h4>Question: "{{ question }}"</h4>
+        
+        {% if error %}
+        <div class="alert alert-danger">
+            {{ error }}
+        </div>
+        {% elif answer %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Answer</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ answer|linebreaks }}</p>
+            </div>
+        </div>
+        
+        {% if source_documents %}
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Source Documents ({{ source_documents|length }})</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for doc in source_documents %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ doc.title }}</strong>
+                            <br>
+                            <small class="text-muted">Uploaded: {{ doc.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <div>
+                            <a href="{% url 'document_detail' doc.id %}" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                            <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                Download
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if source_texts %}
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Relevant Text Excerpts</h5>
+            </div>
+            <div class="card-body">
+                {% for source in source_texts %}
+                <div class="mb-3">
+                    <h6>
+                        From: <a href="{% url 'document_detail' source.document.id %}">{{ source.document.title }}</a>
+                        <span class="badge bg-success ms-2">{{ source.similarity|floatformat:2 }}% match</span>
+                    </h6>
+                    <div class="bg-light p-3 rounded">
+                        <p class="mb-0">{{ source.text|linebreaks }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-warning">
+            No answer generated. Please try a different question.
+        </div>
+        {% endif %}
+        
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-light">
+            <h5>How to use Q&A:</h5>
+            <ul>
+                <li>Ask questions about the content in your uploaded PDFs</li>
+                <li>The system will search through your documents to find relevant information</li>
+                <li>You'll receive an answer along with the source documents used</li>
+                <li>Relevant text excerpts from the documents are also shown</li>
+            </ul>
+            <p class="mt-3"><strong>Example questions:</strong></p>
+            <ul>
+                <li>"What are the main topics discussed in my documents?"</li>
+                <li>"Summarize the key points from my PDFs"</li>
+                <li>"What information is available about [specific topic]?"</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

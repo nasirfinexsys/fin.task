@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Semantic PDF Search</h2>
+        <p class="text-muted">Search your PDFs using semantic similarity. Find documents even if they don't contain the exact words you're looking for.</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <form method="get" class="d-flex">
+            <input class="form-control me-2" type="search" name="q" placeholder="Enter your search query..." 
+                aria-label="Search" value="{{ query }}" required>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+    </div>
+</div>
+
+{% if query %}
+<div class="row">
+    <div class="col-md-12">
+        <h4>Search Results for: "{{ query }}"</h4>
+        {% if results %}
+            <p class="text-muted">Found {{ results|length }} relevant document(s)</p>
+            {% for result in results %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'document_detail' result.document.id %}" class="text-decoration-none">
+                            {{ result.document.title }}
+                        </a>
+                        <span class="badge bg-success ms-2">
+                            {{ result.max_similarity|floatformat:2 }}% match
+                        </span>
+                    </h5>
+                    <p class="card-text text-muted small">
+                        Uploaded: {{ result.document.created_at|date:"M d, Y H:i" }} |
+                        Pages: {{ result.document.page_count|default:"N/A" }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Relevant excerpts ({{ result.chunks|length }} found):</strong>
+                    </p>
+                    <ul class="list-unstyled">
+                        {% for chunk in result.chunks|slice:":3" %}
+                        <li class="mb-2">
+                            <small class="text-muted">Excerpt {{ forloop.counter }}:</small>
+                            <p class="mb-1">{{ chunk.chunk_text|truncatewords:30 }}</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="mt-2">
+                        <a href="{% url 'document_detail' result.document.id %}" class="btn btn-sm btn-outline-primary">
+                            View Document
+                        </a>
+                        <a href="{{ result.document.file.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                            Download PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                No relevant documents found. Try a different search query.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-light">
+            <h5>How to use Semantic Search:</h5>
+            <ul>
+                <li>Enter a search query describing what you're looking for</li>
+                <li>The system will find PDFs that are semantically related to your query</li>
+                <li>Results are ranked by relevance (similarity score)</li>
+                <li>You'll see relevant excerpts from matching documents</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

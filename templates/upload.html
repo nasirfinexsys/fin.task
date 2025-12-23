@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Upload PDF</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="id_title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_file" class="form-label">PDF File</label>
+                        <input type="file" class="form-control" id="id_file" name="file" accept="application/pdf"
+                            required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Upload</button>
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'dashboard' %}" class="text-decoration-none">&larr; Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

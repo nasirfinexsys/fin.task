@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <a href="{% url 'document_list' %}" class="text-decoration-none">&larr; Back to List</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">{{ document.title }}</h3>
+            <a href="{{ document.file.url }}" class="btn btn-primary" target="_blank">Download PDF</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <strong>Status:</strong>
+                <span
+                    class="badge {% if document.status == 'COMPLETED' %}bg-success{% elif 'FAILED' in document.status %}bg-danger{% else %}bg-warning{% endif %}">
+                    {{ document.get_status_display }}
+                </span>
+            </div>
+            <div class="col-md-6">
+                <strong>Uploaded:</strong> {{ document.created_at }}
+            </div>
+            <div class="col-md-6">
+                <strong>Page Count:</strong> {{ document.page_count|default:"Unknown" }}
+            </div>
+        </div>
+
+        {% if document.meta_data %}
+        <div class="mb-4">
+            <h5>Metadata</h5>
+            <ul class="list-group">
+                {% for key, value in document.meta_data.items %}
+                <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if document.error_message %}
+        <div class="alert alert-danger">
+            <strong>Error:</strong> {{ document.error_message }}
+        </div>
+        {% endif %}
+
+        {% if document.text_content %}
+        <h5>Extracted Text Preview</h5>
+        <div class="p-3 bg-light border rounded" style="max-height: 400px; overflow-y: auto; white-space: pre-wrap;">{{ document.text_content }}</div>
+        {% else %}
+        <div class="alert alert-info">
+            Text content is not available or currently processing. Refresh the page to check status.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
